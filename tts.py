@@ -1,4 +1,4 @@
-import requests, base64, random, argparse, os, playsound, time, re, textwrap
+import requests, base64, random, argparse, os, time, re, textwrap
 
 # https://twitter.com/scanlime/status/1512598559769702406
 
@@ -102,7 +102,7 @@ def tts(session_id: str, text_speaker: str = "en_us_002", req_text: str = "TikTo
     print(output_data)
 
     if play is True:
-        playsound.playsound(filename)
+        #playsound.playsound(filename)
         os.remove(filename)
 
     return output_data
