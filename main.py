@@ -15,11 +15,14 @@ def get_tts(text, filename, voice='en_us_006'):
 def parse_script_for_tts(script):
     parsed = []
     parsed = re.split("[.=!]",script)
+
     if parsed[-1] == '':
         parsed.pop(-1)
     #get rid of spaces
     i = 0
     for item in parsed:
+        if item == ' ':
+            parsed.pop(i)
         if parsed[i][0] == ' ':
             parsed[i]=parsed[i][1:]
         if parsed[i][-1] == ' ':
@@ -224,7 +227,7 @@ while repeat:
     print('---------------------------------------------------\nBuilding short final file\n---------------------------------------------------')
     final.save_frame('snippet.png', t=5)
     #final.write_videofile('short.mp4', fps=24)
-    final.write_videofile('short.webm', bitrate = '50000k',fps=24, codec='libvpx', logger=None, threads=8)
+    final.write_videofile('result/short.webm', bitrate = '50000k',fps=24, codec='libvpx', logger=None, threads=8)
 
     # Ask if want to repeat, scrap video or upload
     select = input('Input "1" to upload, "2" to scrap and repeat, "3" to scrap everything: ')

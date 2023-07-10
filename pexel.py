@@ -40,4 +40,4 @@ def save_video(name:str, url:str):
     with open('assets/'+name+'.mp4', "wb") as f: # opening a file handler to create new file 
         f.write(resp.content) # writing content to file
 
-print(get_video_url('sun'))
+#print(get_video_url('sun'))

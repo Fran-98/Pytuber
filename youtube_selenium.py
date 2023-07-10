@@ -19,7 +19,7 @@ def upload_video(video_name, video_description, tags:list):
         json.dump(options,file)
     
     #video_path = 'short.mp4'
-    video_path = 'short.webm'
+    video_path = 'result/short.webm'
 
     uploader = YouTubeUploader(video_path, metadata_path)
     was_video_uploaded = uploader.upload()
