@@ -1,6 +1,7 @@
 # mine
 short.webm
-
+client_secrets.json
+metadata.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
