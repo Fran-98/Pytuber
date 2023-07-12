@@ -55,7 +55,7 @@ def tts(script:str):
 def get_videos(keywords:list):
     print(keywords)
     for keyword in keywords:
-        vid = pexel.get_video_url(keywords[0]+' '+keyword)
+        vid = pexel.get_video_url(keyword)
         if vid != None:
             print(keyword)
             pexel.save_video(keyword, vid)
@@ -225,11 +225,14 @@ while repeat:
 
     # Output file
     print('---------------------------------------------------\nBuilding short final file\n---------------------------------------------------')
-    final.save_frame('snippet.png', t=5)
+    #final.save_frame('snippet.png', t=5)
     #final.write_videofile('short.mp4', fps=24)
     final.write_videofile('result/short.webm', bitrate = '50000k',fps=24, codec='libvpx', logger=None, threads=8)
 
     # Ask if want to repeat, scrap video or upload
+    # but first preview the video
+    #print('Escape to exit the preview and continue the process')
+    #final.preview()
     select = input('Input "1" to upload, "2" to scrap and repeat, "3" to scrap everything: ')
 
     if select == "1":

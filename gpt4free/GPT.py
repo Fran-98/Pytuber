@@ -20,6 +20,11 @@ from .g4f.Provider import (
 
 
 providers = (
+    DeepAi,
+    GetGpt,
+    Ails,
+    You,
+    Bing,
     Theb,
     Yqcloud,
     Vercel,
@@ -30,11 +35,6 @@ providers = (
     Liaobots,
     H2o,
     ChatgptLogin,
-    DeepAi,
-    GetGpt,
-    Ails,
-    You,
-    Bing,
 ) 
 
 
