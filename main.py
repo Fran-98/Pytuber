@@ -23,11 +23,14 @@ def parse_script_for_tts(script):
     for item in parsed:
         if item == ' ':
             parsed.pop(i)
+            i += 1
+            continue
         if parsed[i][0] == ' ':
             parsed[i]=parsed[i][1:]
         if parsed[i][-1] == ' ':
             parsed[i] = parsed[i][:-2]
         i += 1
+    parsed.append('What do you think? Leave it in the comments and subscribe!')
     return parsed
 
 def tts(script:str):
@@ -108,7 +111,7 @@ def generate_subjects():
     if ask == '1':
         again = True
         while again:
-            subjects_short = gpt.get_response(f'return the response in JSON format with only 1 key named "subjects", this key contains 100 subjects for viral youtube shorts about interesting facts, the subjects should be formated as a python list inside the key')
+            subjects_short = gpt.get_response(f'return the response in JSON format with only 1 key named "subjects", this key contains 100 subjects for viral youtube shorts about interesting facts, one fact for video, the subjects should be formated as a python list inside the key')
             try:
                 subjects_short = json.loads(subjects_short.replace('\n',''))
                 again = False

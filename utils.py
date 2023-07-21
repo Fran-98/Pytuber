@@ -32,6 +32,8 @@ def string_cutter(string:str,max:int):
     '''Cuts the string to have "max" number of chars'''
     while len(string) > max:
         string = string[:-2]
+    if string[-1] == "#":
+        string = string[:-2]
     return string
 
 def parse_list_gpt(pseudo_list):

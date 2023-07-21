@@ -22,5 +22,9 @@ def upload_video(video_name, video_description, tags:list):
     video_path = 'result/short.webm'
 
     uploader = YouTubeUploader(video_path, metadata_path)
-    was_video_uploaded = uploader.upload()
+    schedule = input('"1" To schedule, whatever to public now: ')
+    if schedule == '1':
+        was_video_uploaded = uploader.upload(True)
+    else:
+        was_video_uploaded = uploader.upload(False)
     assert was_video_uploaded

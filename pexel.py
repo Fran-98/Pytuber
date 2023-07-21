@@ -1,7 +1,7 @@
 import requests, json, random, os
 pexel_key = os.environ['PEXEL_KEY']
 
-videos_per_page = 15
+videos_per_page = 10
 
 def get_video_url(query,):
     url = f'https://api.pexels.com/videos/search?query={query}&per_page={videos_per_page}'
@@ -9,12 +9,13 @@ def get_video_url(query,):
         'Authorization':pexel_key,
     }
     r = requests.get(headers=headers, url=url)
-    #print(r)
+    print(r)
     if r.status_code != 400:
         response = r.json()
         #print(response)
         if response['total_results'] > 0:
             repeat = True
+            i = 0
             while repeat:
                 if response['total_results'] >= videos_per_page:
                     video_url = get_hd_video(response['videos'][random.randint(0,videos_per_page-1)]['video_files'])
@@ -24,6 +25,9 @@ def get_video_url(query,):
                     video_url = get_hd_video(response['videos'][random.randint(0,response['total_results']-1)]['video_files'])
                     if video_url != None:
                         repeat = False
+                i += 1
+                if i > videos_per_page * 3:
+                    return None
             return video_url
         
     return None
