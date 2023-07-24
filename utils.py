@@ -2,6 +2,8 @@ import os
 
 def delete_folder_contents(folder_path):
     for file in os.listdir(folder_path):
+        if '.gitignore' == file:
+            continue
         file_path = os.path.join(folder_path, file)
         try:
             if os.path.isfile(file_path):
@@ -42,3 +44,4 @@ def parse_list_gpt(pseudo_list):
     else:
         fixed = pseudo_list.split(',')
         return fixed
+    
