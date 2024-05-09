@@ -6,6 +6,12 @@
 /Music
 *.json
 *.log
+*.png
+
+subjects.txt
+script.txt
+cookies.txt
+*.pkl
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
