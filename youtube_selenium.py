@@ -3,7 +3,7 @@ import json
 
 
 
-def upload_video(video_name, video_description, tags:list):
+def upload_video(video_name, video_description, tags:list, file_name, schedule_time:str):
 
     options = {
         "title" : video_name, # The video title
@@ -19,12 +19,13 @@ def upload_video(video_name, video_description, tags:list):
         json.dump(options,file)
     
     #video_path = 'short.mp4'
-    video_path = 'result/short.webm'
+    video_path = f'result/{file_name}.webm'
 
-    uploader = YouTubeUploader(video_path, metadata_path, True)
-    schedule = input('"1" To schedule, whatever to public now: ') 
+    uploader = YouTubeUploader(video_path, metadata_path, False)
+    #schedule = input('"1" To schedule, whatever to public now: ') 
+    schedule = '1'
     if schedule == '1':
-        was_video_uploaded = uploader.upload(True)
+        was_video_uploaded = uploader.upload(schedule_time, True)
     else:
-        was_video_uploaded = uploader.upload(False)
+        was_video_uploaded = uploader.upload(schedule_time, False)
     assert was_video_uploaded

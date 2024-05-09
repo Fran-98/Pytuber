@@ -1,4 +1,4 @@
-import os
+import os, json
 
 def delete_folder_contents(folder_path):
     for file in os.listdir(folder_path):
@@ -45,3 +45,10 @@ def parse_list_gpt(pseudo_list):
         fixed = pseudo_list.split(',')
         return fixed
     
+def save_metadata(dict, file_name):
+    with open(f'assets/{file_name}.json', 'w') as f:
+        json.dump(dict, f, indent = 6)
+
+def load_metadata(file_name):
+    with open(f'assets/{file_name}.json') as f:
+        return json.load(f)
