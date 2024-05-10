@@ -212,10 +212,14 @@ def generate_video(file_name):
             repeat_same = False
 
 def upload(file_name, schedule_time):
+
+    # Parse time
+    time = utils.parse_time_to_now(schedule_time)
+    
     
     meta = utils.load_metadata(file_name)
-    #youtube_uploader.upload_video(video_name, video_description, tags)
-    youtube_selenium.upload_video(meta['video_name'], meta['video_description'], meta['tags'], file_name, schedule_time)
+    #youtube_selenium.upload_video(meta['video_name'], meta['video_description'], meta['tags'], file_name, schedule_time)
+    utils.youtube_upload(file_name, meta['video_name'], meta['video_description'], 22, meta['tags'], schedule_time, "public")
     utils.delete_subject(meta['subject'])
 
     # TikTok upload
@@ -233,7 +237,7 @@ def upload(file_name, schedule_time):
         
     
 def main():
-    default_times = ('0:00', '7:00', '16:00')
+    default_times = ((0,0), (7,0), (16,0)) # tuples that define  (hour, min)
     #quantity_of_videos = int(input('How many videos? '))
     
     # ask for times or use default ones

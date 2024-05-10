@@ -1,4 +1,4 @@
-import os, json
+import os, json, datetime
 
 def delete_folder_contents(folder_path):
     for file in os.listdir(folder_path):
@@ -52,3 +52,41 @@ def save_metadata(dict, file_name):
 def load_metadata(file_name):
     with open(f'assets/{file_name}.json') as f:
         return json.load(f)
+
+def convert_to_RFC_datetime(year=1900, month=1, day=1, hour=0, minute=0):
+    dt = datetime.datetime(year, month, day, hour, minute, 0).isoformat() + 'Z'
+    return dt
+
+
+def parse_time_to_now(time: tuple):
+    parsed = datetime.datetime.now()
+
+    if parsed.hour > time[0]:
+        parsed += datetime.timedelta(days=1)
+
+    parsed.hour = time[0]
+    parsed.minute = time[1]
+    return parsed.year, parsed.month, parsed.day, parsed.hour, parsed.min
+
+def youtube_upload(filename: str, title: str, desc: str, category: int, keywords: list, publishAt: tuple, privacy: str = "private",):
+
+    year, month, day, hour, min = publishAt
+
+    first = True
+    for value in keywords:
+        if first:
+            keywords_str = value
+            first = False
+        else:
+            keywords_str += ',' + value
+
+    os.system(f'python3 uploaders/youtube_uploader.py --file "result/{filename}.webm" \
+              --title "{title}" \
+              --description "{desc}" \
+              --category {category} \
+              --keywords "{keywords_str}" \
+              --privacyStatus "{privacy}" \
+              --publishAt "{convert_to_RFC_datetime(year, month, day, hour, min)}"')
+
+
+

@@ -172,6 +172,8 @@ if __name__ == '__main__':
                            default="")
     argparser.add_argument("--privacyStatus", choices=VALID_PRIVACY_STATUSES,
                            default=VALID_PRIVACY_STATUSES[0], help="Video privacy status.")
+    argparser.add_argument("--publishAt", 
+                           default='', help="Time to schedule the publish.")
     args = argparser.parse_args()
 
     if not os.path.exists(args.file):
