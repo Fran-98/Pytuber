@@ -72,7 +72,7 @@ def tts(session_id: str, text_speaker: str = "en_us_002", req_text: str = "TikTo
     }
     url = f"https://api16-normal-v6.tiktokv.com/media/api/text/speech/invoke/?text_speaker={text_speaker}&req_text={req_text}&speaker_map_type=0&aid=1233"
     r = requests.post(url, headers = headers)
-
+    print(r.json())
     if r.json()["message"] == "Couldn't load speech. Try again.":
         output_data = {"status": "Session ID is invalid", "status_code": 5}
         print(output_data)
@@ -119,7 +119,7 @@ def tts_batch(session_id: str, text_speaker: str = 'en_us_002', req_text: str = 
     url = f"https://api16-normal-useast5.us.tiktokv.com/media/api/text/speech/invoke/?text_speaker={text_speaker}&req_text={req_text}&speaker_map_type=0&aid=1233"
 
     r = requests.post(url, headers=headers)
-
+    
     if r.json()["message"] == "Couldn't load speech. Try again.":
         output_data = {"status": "Session ID is invalid", "status_code": 5}
         print(output_data)

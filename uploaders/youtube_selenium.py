@@ -21,7 +21,7 @@ def upload_video(video_name, video_description, tags:list, file_name, schedule_t
     #video_path = 'short.mp4'
     video_path = f'result/{file_name}.webm'
 
-    uploader = YouTubeUploader(video_path, metadata_path, False)
+    uploader = YouTubeUploader(video_path, metadata_path)
     #schedule = input('"1" To schedule, whatever to public now: ') 
     schedule = '1'
     if schedule == '1':

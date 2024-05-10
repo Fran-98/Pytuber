@@ -1,7 +1,8 @@
 import pvleopard
 from typing import *
+import os
 
-picovoice_key = "LLTl+AsCZt4NbozMs0fV57FZI/5AOZ2b/WP6oqoPpr1sbUZ8eDw6cA=="
+picovoice_key = os.environ['PICOVOICE_KEY']
 leopard = pvleopard.create(access_key = picovoice_key)
 
 def second_to_timecode(x: float) -> str:

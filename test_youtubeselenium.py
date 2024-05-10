@@ -1,4 +1,4 @@
-import youtube_selenium
+import uploaders.youtube_selenium as youtube_selenium
 
 video_description = 'Test'
 video_name = 'Test' + ' #facts #shorts #interestingfacts'

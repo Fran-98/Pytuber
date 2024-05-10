@@ -7,7 +7,7 @@
 *.json
 *.log
 *.png
-
+test*
 subjects.txt
 script.txt
 cookies.txt

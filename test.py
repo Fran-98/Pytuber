@@ -1,4 +1,4 @@
-import youtube_selenium
+import uploaders.youtube_selenium as youtube_selenium
 from moviepy.editor import *
 from moviepy.video.tools.subtitles import SubtitlesClip
 from tiktok_uploader.upload import upload_video

@@ -1,4 +1,5 @@
 import requests, json, random, os
+
 pexel_key = os.environ['PEXEL_KEY']
 
 videos_per_page = 10

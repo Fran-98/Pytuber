@@ -1,17 +1,19 @@
-import os, json, re, subs, utils, threading, random
+import os, re, subs, utils
 import pexel
-import youtube_uploader
-import youtube_selenium
-from tiktok_uploader.upload import upload_video
+import uploaders.youtube_selenium as youtube_selenium
+#from tiktok_uploader.upload import upload_video
 import pandas as pd
-from moviepy.editor import *
+from moviepy.editor import * # Taking my code months later I see that this is a really bad practice
 from moviepy.video.tools.subtitles import SubtitlesClip
-import gpt4free.GPT as gpt
 
-tiktok_session_id = '3f6dfa6694e17b4fcc78a958c77ed021'
+from llm.openai_utils import get_keywords, get_keywords_videos, get_description, get_script, get_subjects
+
+from tiktokvoice import generate_tts
+
+tiktok_session_id = os.environ['TIKTOK_SESSION_ID']
 
 def get_tts(text, filename, voice='en_us_006'):
-    os.system(f'python tts.py -v {voice} -t "{text}" -n {filename} --session {tiktok_session_id}')
+    generate_tts(text, voice, filename, False)
 
 def parse_script_for_tts(script):
     parsed = []
@@ -64,41 +66,7 @@ def get_videos(keywords:list):
             print(keyword)
             pexel.save_video(keyword, vid)
 
-def get_keywords(subject):
-    again = True
-    while again:
-        keywords_short = gpt.get_response(f'return the response in JSON format with only 1 key named "keywords", this key contains 3 keywords to put in a title of a youtube video about {subject}, the keywords should be formated as a python list inside the key, do not return anything besides the JSON that I asked')
-        try:
-            keywords_short = json.loads(keywords_short)
-            again = False
-            break
-        except:
-            again = True
-    return keywords_short['keywords']
 
-def get_keywords_videos(subject):
-    again = True
-    while again:
-        keywords_short = gpt.get_response(f'return the response in JSON format with only 1 key named "keywords", this key contains 5 keywords to search for the background videos about "{subject}", keywords can be long and each one will be used to search for a single video, the keywords should be formated as a python list inside the key, do not return anything besides the JSON that I asked')
-        try:
-            keywords_short = json.loads(keywords_short)
-            again = False
-            break
-        except:
-            again = True
-    return keywords_short['keywords']
-
-def get_description(script):
-    again = True
-    while again:
-        desc = gpt.get_response(f'return the response in JSON format with only 1 key named "description", this key contains a super short description of a youtube video which script is : "{script}"')
-        try:
-            desc = json.loads(desc)
-            again = False
-            break
-        except:
-            again = True
-    return desc['description']
 
 def pick_subject():
     subjects = utils.read_subjects()
@@ -108,50 +76,22 @@ def pick_subject():
     #select = random.randint(0,len(df))
     return subjects[select]
 
-def generate_subjects():
-    ask = input('"1" to generate subjects, "2" to input subject, or anything to use existent list: ')
-    if ask == '1':
-        again = True
-        while again:
-            subjects_short = gpt.get_response(f'return the response in JSON format with only 1 key named "subjects", this key contains 100 detailed subjects for viral youtube shorts about puntual interesting facts, one fact for video, the subjects should be formated as a python list inside the key')
-            try:
-                subjects_short = json.loads(subjects_short.replace('\n',''))
-                again = False
-                break
-            except:
-                again = True
-                
-        utils.save_subjects(subjects_short['subjects'])
-        return False
-    if ask == '2':
-        return True
+
 
 def generate_video(file_name):    
     repeat = True
     repeat_same = False
     while repeat:
-        # Get prompt and make it a dict
-        formatting_prompt = 'Temperature:1. Return the response as a JSON object with only 2 keys. In the key "script" should be the text thats being read in the video and the other key is the key named "title" and has to be the title of the short video\n'
-        
         if not repeat_same:
-            input_subject = generate_subjects()
+            input_subject = get_subjects()
             if input_subject:
                 subject = input('Input the subject you want: ')
             else:
                 subject = pick_subject()
         
-        valid = False
-        while not valid:
-            r = gpt.get_response(formatting_prompt + f'Write a script for a youtube short about one interesting fact about {subject}, explain the fact and give some interesting information about it. The script only consist of the text thats going to be reading the video. Put it all inside the script key of the JSON. Start the script asking something.')
-            try:
-                dic = r.replace('\n','')
-                dic = json.loads(dic)
-                print(dic)
-                script = dic['script'].replace('\n','')
-                video_name = dic['title']
-                valid = True
-            except:
-                valid = False
+
+        script, video_name = get_script(subject)
+
 
         # Generate the tts
         repeat_same = tts(file_name, script)
@@ -192,8 +132,8 @@ def generate_video(file_name):
                 else:
                     extra_time += video_duration - videos[-1].duration
                     
-            except:
-                print(f'Video with keyword {keyword} not found.')
+            except Exception as e:
+                print(f'Video with keyword {keyword} not found.', e)
         
         # Fill final video
         if extra_time > 0:
@@ -214,10 +154,12 @@ def generate_video(file_name):
                         else:
                             videos[-1]=videos[-1].subclip(0, extra_time)
                             break
-                except:
-                    print(f'Video with keyword {keyword} not found.')
+                except Exception as e:
+                    print(f'Video with keyword {keyword} not found for filling.', e)
 
-        # Merge videos and tts
+        # ---------------------#
+        # Merge videos and tts #
+        # ---------------------#
 
         final = concatenate_videoclips(videos, method= 'compose')
         final = final.set_audio(audio)
@@ -233,7 +175,7 @@ def generate_video(file_name):
         print('---------------------------------------------------\nBuilding short final file\n---------------------------------------------------')
         #final.save_frame('snippet.png', t=5)
         #final.write_videofile('short.mp4', fps=24)
-        final.write_videofile(f'result/{file_name}.webm', bitrate = '50000k',fps=24, codec='libvpx', logger=None, threads=8)
+        final.write_videofile(f'result/{file_name}.webm', bitrate = '50000k',fps=24, codec='libvpx', logger=None, threads=8, verbose='bar', preset='ultrafast')
 
         # Ask if want to repeat, scrap video or upload
         # but first preview the video
@@ -296,11 +238,13 @@ def main():
     
     # ask for times or use default ones
     for i in range(len(default_times)):
-        
+        utils.delete_folder_contents('assets/')
+        utils.delete_folder_contents('result/')
         generate_video(f'short{i}')
         upload(f'short{i}', default_times[i%3])
         
     utils.delete_folder_contents('assets/')
     utils.delete_folder_contents('result/')
 
-main()
+if __name__ == '__main__':
+    main()
