@@ -46,11 +46,11 @@ def parse_list_gpt(pseudo_list):
         return fixed
     
 def save_metadata(dict, file_name):
-    with open(f'assets/{file_name}.json', 'w') as f:
+    with open(f'/tmp/assets/{file_name}.json', 'w') as f:
         json.dump(dict, f, indent = 6)
 
 def load_metadata(file_name):
-    with open(f'assets/{file_name}.json') as f:
+    with open(f'/tmp/assets/{file_name}.json') as f:
         return json.load(f)
 
 def convert_to_RFC_datetime(year=1900, month=1, day=1, hour=0, minute=0):
@@ -64,8 +64,8 @@ def parse_time_to_now(time: tuple):
     if parsed.hour > time[0]:
         parsed += datetime.timedelta(days=1)
 
-    parsed.hour = time[0]
-    parsed.minute = time[1]
+    parsed.replace(hour=time[0], minute=time[1])
+
     return parsed.year, parsed.month, parsed.day, parsed.hour, parsed.min
 
 def youtube_upload(filename: str, title: str, desc: str, category: int, keywords: list, publishAt: tuple, privacy: str = "private",):
@@ -80,7 +80,7 @@ def youtube_upload(filename: str, title: str, desc: str, category: int, keywords
         else:
             keywords_str += ',' + value
 
-    os.system(f'python3 uploaders/youtube_uploader.py --file "result/{filename}.webm" \
+    os.system(f'python3 uploaders/youtube_uploader.py --file "/tmp/result/{filename}.webm" \
               --title "{title}" \
               --description "{desc}" \
               --category {category} \

@@ -42,7 +42,7 @@ def get_hd_video(videos):
 
 def save_video(name:str, url:str):
     resp = requests.get(url) # making requests to server
-    with open('assets/'+name+'.mp4', "wb") as f: # opening a file handler to create new file 
+    with open('/tmp/assets/'+name+'.mp4', "wb") as f: # opening a file handler to create new file 
         f.write(resp.content) # writing content to file
 
 #print(get_video_url('sun'))

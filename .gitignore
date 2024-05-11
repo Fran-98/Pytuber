@@ -12,6 +12,7 @@ subjects.txt
 script.txt
 cookies.txt
 *.pkl
+/tmp
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

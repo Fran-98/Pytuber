@@ -42,11 +42,11 @@ def tts(file_name, script:str):
     i=0
     for s in p:
         if s != '':
-            get_tts(s.replace('\n',''), f'assets/{file_name}_script{i}.mp3')
+            get_tts(s.replace('\n',''), f'/tmp/assets/{file_name}_script{i}.mp3')
             i+=1
     audio = []
     for i in range(len(p)):
-        audio.append(AudioFileClip(f'assets/{file_name}_script{i}.mp3'))
+        audio.append(AudioFileClip(f'/tmp/assets/{file_name}_script{i}.mp3'))
     #audio.pop(-1)
     final_audio = concatenate_audioclips(audio)
 
@@ -55,7 +55,7 @@ def tts(file_name, script:str):
         return True
 
     
-    final_audio.write_audiofile(f'assets/{file_name}.mp3')
+    final_audio.write_audiofile(f'/tmp/assets/{file_name}.mp3')
     return False
 
 def get_videos(keywords:list):
@@ -114,7 +114,7 @@ def generate_video(file_name):
         get_videos(keywords)
 
         # get length of tts
-        audio = AudioFileClip(f'assets/{file_name}.mp3')
+        audio = AudioFileClip(f'/tmp/assets/{file_name}.mp3')
         duration = audio.duration
         video_duration = duration/len(keywords)
 
@@ -123,7 +123,7 @@ def generate_video(file_name):
         extra_time = 0
         for keyword in keywords:
             try:
-                videos.append(VideoFileClip('assets/'+keyword+'.mp4'))
+                videos.append(VideoFileClip('/tmp/assets/'+keyword+'.mp4'))
                 videos[-1]=videos[-1].without_audio()
                 videos[-1]=videos[-1].resize(width=1920)
                 videos[-1]=videos[-1].crop(x_center = videos[-1].size[0]/2, y_center = videos[-1].size[1]/2, width = 607.5, height = 1080)
@@ -139,7 +139,7 @@ def generate_video(file_name):
         if extra_time > 0:
             for keyword in keywords:
                 try:
-                    videos.append(VideoFileClip('assets/'+keyword+'.mp4'))
+                    videos.append(VideoFileClip('/tmp/assets/'+keyword+'.mp4'))
                     videos[-1]=videos[-1].without_audio()
                     videos[-1]=videos[-1].resize(width=1920)
                     videos[-1]=videos[-1].crop(x_center = videos[-1].size[0]/2, y_center = videos[-1].size[1]/2, width = 607.5, height = 1080)
@@ -168,14 +168,14 @@ def generate_video(file_name):
         # Add subtitles
         subs.get_str_file(file_name)
         generator = lambda txt: TextClip(txt, font='Impact', fontsize=32, color='white', stroke_color= 'black', stroke_width= 1, method='caption',size=final.size)
-        sub_clip = SubtitlesClip('assets/subs.srt', generator)
+        sub_clip = SubtitlesClip('/tmp/assets/subs.srt', generator)
         final = CompositeVideoClip([final, sub_clip])
 
         # Output file
         print('---------------------------------------------------\nBuilding short final file\n---------------------------------------------------')
         #final.save_frame('snippet.png', t=5)
         #final.write_videofile('short.mp4', fps=24)
-        final.write_videofile(f'result/{file_name}.webm', bitrate = '50000k',fps=24, codec='libvpx', logger=None, threads=8, verbose='bar', preset='ultrafast')
+        final.write_videofile(f'/tmp/result/{file_name}.webm', bitrate = '50000k',fps=24, codec='libvpx', logger=None, threads=8, verbose='bar', preset='ultrafast')
 
         # Ask if want to repeat, scrap video or upload
         # but first preview the video
@@ -219,7 +219,7 @@ def upload(file_name, schedule_time):
     
     meta = utils.load_metadata(file_name)
     #youtube_selenium.upload_video(meta['video_name'], meta['video_description'], meta['tags'], file_name, schedule_time)
-    utils.youtube_upload(file_name, meta['video_name'], meta['video_description'], 22, meta['tags'], schedule_time, "public")
+    utils.youtube_upload(file_name, meta['video_name'], meta['video_description'], 22, meta['tags'], time, "public")
     utils.delete_subject(meta['subject'])
 
     # TikTok upload
@@ -240,15 +240,24 @@ def main():
     default_times = ((0,0), (7,0), (16,0)) # tuples that define  (hour, min)
     #quantity_of_videos = int(input('How many videos? '))
     
+    tmp_dir = os.listdir('/tmp')
+
+    if 'assets' not in tmp_dir:
+        os.mkdir('/tmp/assets')
+        
+    if 'result' not in tmp_dir:
+        os.mkdir('/tmp/result')
+    
     # ask for times or use default ones
     for i in range(len(default_times)):
-        utils.delete_folder_contents('assets/')
-        utils.delete_folder_contents('result/')
+
+        utils.delete_folder_contents('/tmp/assets/')
+        utils.delete_folder_contents('/tmp/result/')
         generate_video(f'short{i}')
         upload(f'short{i}', default_times[i%3])
         
-    utils.delete_folder_contents('assets/')
-    utils.delete_folder_contents('result/')
+    utils.delete_folder_contents('/tmp/assets/')
+    utils.delete_folder_contents('/tmp/result/')
 
 if __name__ == '__main__':
     main()

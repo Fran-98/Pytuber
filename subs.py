@@ -36,8 +36,8 @@ def to_srt(words: Sequence[pvleopard.Leopard.Word], endpoint_sec: float = 1., le
     return '\n'.join(lines)
 
 def get_str_file(file_name):
-    transcript, words = leopard.process_file(f'assets/{file_name}.mp3')
-    with open('assets/subs.srt', 'w') as f:
+    transcript, words = leopard.process_file(f'/tmp/assets/{file_name}.mp3')
+    with open('/tmp/assets/subs.srt', 'w') as f:
         # noinspection PyUnboundLocalVariable
         f.write(to_srt(words))
         f.write('\n')
