@@ -219,7 +219,7 @@ def upload(file_name, schedule_time):
     
     meta = utils.load_metadata(file_name)
     #youtube_selenium.upload_video(meta['video_name'], meta['video_description'], meta['tags'], file_name, schedule_time)
-    utils.youtube_upload(file_name, meta['video_name'], meta['video_description'], 22, meta['tags'], time, "public")
+    utils.youtube_upload(file_name, meta['video_name'], meta['video_description'], 22, meta['tags'], time, "private")
     utils.delete_subject(meta['subject'])
 
     # TikTok upload

@@ -1,5 +1,6 @@
 import os, json, datetime
 
+
 def delete_folder_contents(folder_path):
     for file in os.listdir(folder_path):
         if '.gitignore' == file:
@@ -64,9 +65,8 @@ def parse_time_to_now(time: tuple):
     if parsed.hour > time[0]:
         parsed += datetime.timedelta(days=1)
 
-    parsed.replace(hour=time[0], minute=time[1])
-
-    return parsed.year, parsed.month, parsed.day, parsed.hour, parsed.min
+    parsed = parsed.replace(hour=time[0], minute=time[1])
+    return parsed.year, parsed.month, parsed.day, parsed.hour, parsed.minute
 
 def youtube_upload(filename: str, title: str, desc: str, category: int, keywords: list, publishAt: tuple, privacy: str = "private",):
 
@@ -79,8 +79,18 @@ def youtube_upload(filename: str, title: str, desc: str, category: int, keywords
             first = False
         else:
             keywords_str += ',' + value
+    
+    args = {
+        "file": f"/tmp/result/{filename}.webm",
+        "title": title,
+        "description": desc,
+        "category": category,
+        "keywords": keywords_str,
+        "privacyStatus": privacy,
+        "publishAt": convert_to_RFC_datetime(year, month, day, hour, min)
+    }
 
-    os.system(f'python3 uploaders/youtube_uploader.py --file "/tmp/result/{filename}.webm" \
+    os.system(f'python uploaders/youtube_uploader.py --file "/tmp/result/{filename}.webm" \
               --title "{title}" \
               --description "{desc}" \
               --category {category} \

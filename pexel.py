@@ -10,7 +10,7 @@ def get_video_url(query,):
         'Authorization':pexel_key,
     }
     r = requests.get(headers=headers, url=url)
-    print(r)
+    # print(r)
     if r.status_code != 400:
         response = r.json()
         #print(response)
