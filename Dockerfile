@@ -6,7 +6,7 @@ WORKDIR /Pytuber
 
 # Copy the current directory contents into the container at /Pytuber
 COPY . /Pytuber
-COPY client_secrets.json /Pytuber/client_secrets.json
+RUN echo client_secrets.json 
 # Update package list and install necessary system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
