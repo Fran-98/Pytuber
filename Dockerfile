@@ -6,8 +6,7 @@ WORKDIR /Pytuber
 
 # Copy the current directory contents into the container at /Pytuber
 COPY . /Pytuber
-RUN ls
-RUN ls $WORKDIR
+
 # Update package list and install necessary system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
