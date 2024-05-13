@@ -5,7 +5,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 gauth = GoogleAuth()
 scope = ["https://www.googleapis.com/auth/drive"]
-gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secrets.json', scope)
+gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name('/secrets/client_secrets.json', scope)
 drive = GoogleDrive(gauth)
 
 def delete_folder_contents(folder_path):
