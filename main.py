@@ -190,7 +190,7 @@ def generate_video(file_name, cloud_run):
                               logger=None, 
                               verbose='bar', 
                               preset='ultrafast', 
-                              temp_audiofile= '/tmp/result/tmp_audio')
+                              temp_audiofile= '/tmp/result/tmp_audio.ogg')
 
         # Ask if want to repeat, scrap video or upload
         # but first preview the video
