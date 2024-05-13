@@ -69,7 +69,10 @@ def get_videos(keywords:list):
 
 
 def pick_subject(cloud_run):
-    subjects = utils.read_subjects()
+    subjects = utils.read_subjects() # I need to handle the situation when there is no subjects or the file doesnt exist
+    if not subjects:
+        get_subjects(True)
+        subjects = utils.read_subjects()
     df = pd.DataFrame(subjects)
     print(df.to_string())
     if not cloud_run:
@@ -87,7 +90,7 @@ def generate_video(file_name, cloud_run):
     while repeat:
         if not repeat_same:
             if not cloud_run:
-                input_subject = get_subjects()
+                input_subject = get_subjects(False)
                 if input_subject:
                     subject = input('Input the subject you want: ')
                 else:
@@ -181,7 +184,13 @@ def generate_video(file_name, cloud_run):
         print('---------------------------------------------------\nBuilding short final file\n---------------------------------------------------')
         #final.save_frame('snippet.png', t=5)
         #final.write_videofile('short.mp4', fps=24)
-        final.write_videofile(f'/tmp/result/{file_name}.webm', bitrate = '50000k',fps=24, codec='libvpx', logger=None, threads=8, verbose='bar', preset='ultrafast')
+        final.write_videofile(f'/tmp/result/{file_name}.webm', 
+                              bitrate = '50000k',
+                              fps=24, codec='libvpx', 
+                              logger=None, 
+                              verbose='bar', 
+                              preset='ultrafast', 
+                              temp_audiofile= '/tmp/result/tmp_audio')
 
         # Ask if want to repeat, scrap video or upload
         # but first preview the video
@@ -262,7 +271,7 @@ def main():
 
         utils.delete_folder_contents('/tmp/assets/')
         utils.delete_folder_contents('/tmp/result/')
-        generate_video(f'short{i}')
+        generate_video(f'short{i}', False)
         upload(f'short{i}', default_times[i%3])
         
     utils.delete_folder_contents('/tmp/assets/')

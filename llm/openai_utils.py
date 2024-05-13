@@ -87,13 +87,16 @@ def get_script(subject):
             valid = False
     
 
-def get_subjects():
-    ask = input('"1" to generate subjects, "2" to input subject, or anything to use existent list: ')
+def get_subjects(generate):
+    if generate:
+        ask = '1'
+    else:
+        ask = input('"1" to generate subjects, "2" to input subject, or anything to use existent list: ')
     if ask == '1':
         again = True
         while again:
             subjects_short = get_response(SUBJECTS_SYS, SUBJECTS_USER)
-            print(subjects_short)
+            #print(subjects_short)
             try:
                 subjects_short = json.loads(subjects_short.replace('\n',''))
                 again = False

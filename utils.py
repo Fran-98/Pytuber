@@ -1,5 +1,12 @@
 import os, json, datetime
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+from oauth2client.service_account import ServiceAccountCredentials
 
+gauth = GoogleAuth()
+scope = ["https://www.googleapis.com/auth/drive"]
+gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secrets.json', scope)
+drive = GoogleDrive(gauth)
 
 def delete_folder_contents(folder_path):
     for file in os.listdir(folder_path):
@@ -14,22 +21,83 @@ def delete_folder_contents(folder_path):
         except Exception as e:  
             print(f"Error deleting {file_path}: {e}")
     print("Assets cleaned")
-    
+
+
+def read_file(title_file, id_file):
+    """
+    Function to read txt files from google drive
+    """
+    metadata = dict(id = id_file)
+
+    google_file = drive.CreateFile(metadata = metadata)
+
+    google_file.GetContentFile(filename = f"/tmp/{title_file}.txt")
+
+    content_bytes = google_file.content ; # BytesIO
+
+    string_data = content_bytes.read().decode( 'utf-8' )
+
+    return string_data
+
+
 def read_subjects():
-    with open('subjects.txt') as file:
-        return file.read().splitlines()
+    file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+
+    for file in file_list:
+        if "subjects" in file['title']:
+            #print(file['title'])
+            return read_file(file['title'], file['id']).splitlines()
+
+    # If no subject exist, create one
+
+    return None
+
+def delete_subjects_files():
+    file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+
+    for file in file_list:
+        #print(file)
+        if "subjects" in file['title']:
+            drive.CreateFile({'id': file['id']}).Delete()
+
+
+def find_subjects_file():
+    file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+
+    for file in file_list:
+        #print(file)
+        if "subjects" in file['title']:
+            return file['id']
+    
+    # If not found a file return None and manage that case
+    return None
+
+def upload_subject(items: str):
+    subject_id = find_subjects_file()
+    if subject_id:
+        file1 = drive.CreateFile({'title': 'subjects.txt', 'id': subject_id})
+    else:
+        file1 = drive.CreateFile({'title': 'subjects.txt'}) # Create new file
+
+    file1.SetContentString(items)
+    file1.Upload() # Files.insert()
 
 def delete_subject(subject):
     subjects = read_subjects()
-    with open('subjects.txt', 'w') as file:
-        for item in subjects:
-            if item != subject:
-                file.write(item+'\n')
+    items = ''
+    for item in subjects:
+        if item != subject:
+            items += item+'\n'
+    
+    upload_subject(items)
+            
 
 def save_subjects(subjects: list):
-    with open('subjects.txt', 'w') as file:
-        for item in subjects:
-            file.write(item+'\n')
+    items = ''
+    for item in subjects:
+        items += item+'\n'
+    upload_subject(items)
+
 
 def string_cutter(string:str,max:int):
     '''Cuts the string to have "max" number of chars'''
@@ -80,15 +148,15 @@ def youtube_upload(filename: str, title: str, desc: str, category: int, keywords
         else:
             keywords_str += ',' + value
     
-    args = {
-        "file": f"/tmp/result/{filename}.webm",
-        "title": title,
-        "description": desc,
-        "category": category,
-        "keywords": keywords_str,
-        "privacyStatus": privacy,
-        "publishAt": convert_to_RFC_datetime(year, month, day, hour, min)
-    }
+    # args = {
+    #     "file": f"/tmp/result/{filename}.webm",
+    #     "title": title,
+    #     "description": desc,
+    #     "category": category,
+    #     "keywords": keywords_str,
+    #     "privacyStatus": privacy,
+    #     "publishAt": convert_to_RFC_datetime(year, month, day, hour, min)
+    # }
 
     os.system(f'python uploaders/youtube_uploader.py --file "/tmp/result/{filename}.webm" \
               --title "{title}" \
