@@ -14,8 +14,9 @@ RUN apt-get update && \
     libjpeg-dev \
     libtiff-dev \
     imagemagick \
+    libmagickwand-dev \
     && rm -rf /var/lib/apt/lists/*
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install libmagickwand-dev --no-install-recommends -y
+RUN convert -version
 # Install any needed dependencies specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
