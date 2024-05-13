@@ -1,4 +1,4 @@
-import os, re, subs, utils
+import os, re, subs, utils, random
 import pexel
 import uploaders.youtube_selenium as youtube_selenium
 #from tiktok_uploader.upload import upload_video
@@ -68,26 +68,32 @@ def get_videos(keywords:list):
 
 
 
-def pick_subject():
+def pick_subject(cloud_run):
     subjects = utils.read_subjects()
     df = pd.DataFrame(subjects)
     print(df.to_string())
-    select = int(input('Select subject index: '))
-    #select = random.randint(0,len(df))
-    return subjects[select]
+    if not cloud_run:
+        select = int(input('Select subject index: '))
+        return subjects[select]
+    else:
+        select = random.randint(0,len(df))
+        return subjects[select]
 
 
 
-def generate_video(file_name):    
+def generate_video(file_name, cloud_run):    
     repeat = True
     repeat_same = False
     while repeat:
         if not repeat_same:
-            input_subject = get_subjects()
-            if input_subject:
-                subject = input('Input the subject you want: ')
+            if not cloud_run:
+                input_subject = get_subjects()
+                if input_subject:
+                    subject = input('Input the subject you want: ')
+                else:
+                    subject = pick_subject()
             else:
-                subject = pick_subject()
+                subject = pick_subject(cloud_run)
         
 
         script, video_name = get_script(subject)
@@ -194,14 +200,18 @@ def generate_video(file_name):
         print(f'Name: {video_name}')
         print(f'Description: {video_description}')
         print(f'Tags: {tags}')
-        jason = {
+        defined_meta = {
             'subject': subject,
             'video_name': video_name,
             'video_description': video_description,
             'tags': tags,
                  }
-        utils.save_metadata(jason, file_name)
-        select = input(f'Input "1" to upload video "{file_name}", "2" to scrap and repeat same, anything to scrap and pick another: ')
+        utils.save_metadata(defined_meta, file_name)
+        if not cloud_run:
+            select = input(f'Input "1" to upload video "{file_name}", "2" to scrap and repeat same, anything to scrap and pick another: ')
+        else:
+            select = '1'
+
         if select == '1':
             repeat = False
         elif select == '2':
@@ -215,7 +225,6 @@ def upload(file_name, schedule_time):
 
     # Parse time
     time = utils.parse_time_to_now(schedule_time)
-    
     
     meta = utils.load_metadata(file_name)
     #youtube_selenium.upload_video(meta['video_name'], meta['video_description'], meta['tags'], file_name, schedule_time)
