@@ -7,9 +7,9 @@ WORKDIR /Pytuber
 # Copy the current directory contents into the container at /app
 COPY . /Pytuber
 
-RUN sudo apt update && sudo apt upgrade \
-sudo apt install libpng-dev libjpeg-dev libtiff-dev \
-sudo apt install imagemagick
+RUN sudo apt update && sudo apt upgrade
+RUN sudo apt install libpng-dev libjpeg-dev libtiff-dev
+RUN sudo apt install imagemagick
 
 
 # Install any needed dependencies specified in requirements.txt
