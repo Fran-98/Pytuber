@@ -176,7 +176,8 @@ def generate_video(file_name, cloud_run):
 
         # Add subtitles
         subs.get_str_file(file_name)
-        generator = lambda txt: TextClip(txt, font='Impact', fontsize=32, color='white', stroke_color= 'black', stroke_width= 1, method='caption',size=final.size)
+        #print(TextClip.list('font'))
+        generator = lambda txt: TextClip(txt, font='Impact-Regular', fontsize=32, color='white', stroke_color= 'black', stroke_width= 1, method='caption',size=final.size)
         sub_clip = SubtitlesClip('/tmp/assets/subs.srt', generator)
         final = CompositeVideoClip([final, sub_clip])
 

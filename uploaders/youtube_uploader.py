@@ -90,7 +90,7 @@ VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")
 def get_authenticated_service(args):
     # Define the scope of the application
     SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
-    SERVICE_ACCOUNT_FILE = 'client_secrets.json'
+    SERVICE_ACCOUNT_FILE = CLIENT_SECRETS_FILE
 
     # Create credentials from the service account file
     credentials = service_account.Credentials.from_service_account_file(
