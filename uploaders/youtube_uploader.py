@@ -43,7 +43,7 @@ RETRIABLE_STATUS_CODES = [500, 502, 503, 504]
 #   https://developers.google.com/youtube/v3/guides/authentication
 # For more information about the client_secrets.json file format, see:
 #   https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
-CLIENT_SECRETS_FILE = "/secrets/client_secrets.json"
+CLIENT_SECRETS_FILE = "/secrets_youtube/client_secrets_youtube.json"
 
 # This OAuth 2.0 access scope allows an application to upload files to the
 # authenticated user's YouTube channel, but doesn't allow other types of access.
@@ -87,20 +87,34 @@ VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")
 #                  http=credentials.authorize(httplib2.Http()))
 
 
+# def get_authenticated_service(args):
+#     # Define the scope of the application
+#     SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
+#     SERVICE_ACCOUNT_FILE = CLIENT_SECRETS_FILE
+
+#     # Create credentials from the service account file
+#     credentials = service_account.Credentials.from_service_account_file(
+#         SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+#     # Authorize and build the service
+#     authorized_http = google_auth_httplib2.AuthorizedHttp(credentials, httplib2.Http())
+#     youtube_service = build('youtube', 'v3', http=authorized_http)
+
+#     return youtube_service
+
 def get_authenticated_service(args):
-    # Define the scope of the application
-    SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
-    SERVICE_ACCOUNT_FILE = CLIENT_SECRETS_FILE
+  flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE,
+    scope=YOUTUBE_UPLOAD_SCOPE,
+    message=MISSING_CLIENT_SECRETS_MESSAGE)
 
-    # Create credentials from the service account file
-    credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+  storage = Storage("/tmp/youtube-oauth2.json")
+  credentials = storage.get()
 
-    # Authorize and build the service
-    authorized_http = google_auth_httplib2.AuthorizedHttp(credentials, httplib2.Http())
-    youtube_service = build('youtube', 'v3', http=authorized_http)
+  if credentials is None or credentials.invalid:
+    credentials = run_flow(flow, storage, args)
 
-    return youtube_service
+  return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
+    http=credentials.authorize(httplib2.Http()))
 
 
 def initialize_upload(youtube, options):

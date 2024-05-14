@@ -10,7 +10,7 @@ drive = GoogleDrive(gauth)
 
 def delete_folder_contents(folder_path):
     for file in os.listdir(folder_path):
-        if '.gitignore' == file:
+        if '.gitignore' == file or 'youtube-oauth2.json' == file:
             continue
         file_path = os.path.join(folder_path, file)
         try:

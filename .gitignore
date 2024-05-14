@@ -13,6 +13,7 @@ script.txt
 cookies.txt
 *.pkl
 /tmp
+/secrets
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
