@@ -1,5 +1,5 @@
 import os, re, subs, utils, random
-import pexel
+import videos
 import uploaders.youtube_selenium as youtube_selenium
 #from tiktok_uploader.upload import upload_video
 import pandas as pd
@@ -61,10 +61,12 @@ def tts(file_name, script:str):
 def get_videos(keywords:list):
     print(keywords)
     for keyword in keywords:
-        vid = pexel.get_video_url(keyword)
+        print("--------------------------------VIDEO-------------------------------")
+        vid = videos.get_video_url(keyword)
+        print(vid)
         if vid != None:
             print(keyword)
-            pexel.save_video(keyword, vid)
+            videos.save_video(keyword, vid)
 
 
 
