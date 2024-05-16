@@ -21,7 +21,7 @@ def get_video_url_pexel(query,):
     # print(r)
     if r.status_code != 400:
         response = r.json()
-        print(response)
+        #print(response)
         if response['total_results'] > 0:
             repeat = True
             i = 0
@@ -62,7 +62,7 @@ def get_video_url_pixabay(query: str,):
     # print(r)
     if r.status_code != 400:
         response = r.json()
-        print(response)
+        #print(response)
         if response['total'] > 0:
             repeat = True
             i = 0
@@ -86,4 +86,4 @@ def get_video_url_pixabay(query: str,):
     return None
 
 #print(get_video_url_pexel('nature'))
-print(get_video_url_pixabay('nature'))
+#print(get_video_url_pixabay('nature'))
