@@ -61,9 +61,8 @@ def tts(file_name, script:str):
 def get_videos(keywords:list):
     print(keywords)
     for keyword in keywords:
-        print("--------------------------------VIDEO-------------------------------")
+        #print("--------------------------------VIDEO-------------------------------")
         vid = videos.get_video_url(keyword)
-        print(vid)
         if vid != None:
             print(keyword)
             videos.save_video(keyword, vid)
@@ -258,7 +257,7 @@ def upload(file_name, schedule_time):
         
     
 def main():
-    default_times = ((0,0), (7,0), (16,0)) # tuples that define  (hour, min)
+    default_times = ((8,0), (16,0), (21,0)) # tuples that define  (hour, min)
     #quantity_of_videos = int(input('How many videos? '))
     
     tmp_dir = os.listdir('/tmp')
