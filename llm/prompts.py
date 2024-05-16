@@ -16,7 +16,7 @@ KEYWORDS_VIDS_USER = 'Write 5 keywords to search for background videos about "{}
 DESC_SYS = 'You are a very creative writer that has really cool ideas for videos in short format. \
     Return your response only in a JSON object with only 1 key named "description". Do not add anything thats not a JSON'
 
-DESC_USER = 'Write a super super short description of a youtube video which script is as follows: "{}"'
+DESC_USER = 'Write a super super short description of a youtube video which script is as follows: "{}", make it clickbaity.'
 
 
 SCRIPT_SYS = 'You are a very creative writer that is brainstorming some cool ideas for videos in short format. \
