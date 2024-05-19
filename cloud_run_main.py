@@ -2,7 +2,7 @@ import os
 from main import generate_video, upload
 
 def cloud_run_pipeline():
-    default_times = ((0,0), (7,0), (16,0)) # tuples that define  (hour, min)
+    default_times = ((9,0), (16,0)) # tuples that define  (hour, min)
     #quantity_of_videos = int(input('How many videos? '))
     
     tmp_dir = os.listdir('/tmp')
