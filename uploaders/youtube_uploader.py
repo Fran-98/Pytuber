@@ -115,7 +115,7 @@ def get_authenticated_service(args):
     # Create a temporary file and copy the content of the original credentials file to it
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         temp_path = temp_file.name
-        with open(original_credentials_path, 'r') as original_file:
+        with open(original_credentials_path, 'rb') as original_file:
             shutil.copyfileobj(original_file, temp_file)
 
     storage = Storage(temp_path)
