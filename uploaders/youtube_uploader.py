@@ -13,6 +13,8 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import argparser, run_flow
 
+import tempfile
+import shutil
 import sys
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -87,34 +89,43 @@ VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")
 #                  http=credentials.authorize(httplib2.Http()))
 
 
+
 # def get_authenticated_service(args):
-#     # Define the scope of the application
-#     SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
-#     SERVICE_ACCOUNT_FILE = CLIENT_SECRETS_FILE
+#   flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE,
+#     scope=YOUTUBE_UPLOAD_SCOPE,
+#     message=MISSING_CLIENT_SECRETS_MESSAGE)
 
-#     # Create credentials from the service account file
-#     credentials = service_account.Credentials.from_service_account_file(
-#         SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+#   storage = Storage("/oauth2/youtube-oauth2.json")
+#   credentials = storage.get()
 
-#     # Authorize and build the service
-#     authorized_http = google_auth_httplib2.AuthorizedHttp(credentials, httplib2.Http())
-#     youtube_service = build('youtube', 'v3', http=authorized_http)
+#   if credentials is None or credentials.invalid:
+#     credentials = run_flow(flow, storage, args)
 
-#     return youtube_service
+#   return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
+#     http=credentials.authorize(httplib2.Http()))
 
 def get_authenticated_service(args):
-  flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE,
-    scope=YOUTUBE_UPLOAD_SCOPE,
-    message=MISSING_CLIENT_SECRETS_MESSAGE)
+    flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE,
+        scope=YOUTUBE_UPLOAD_SCOPE,
+        message=MISSING_CLIENT_SECRETS_MESSAGE)
 
-  storage = Storage("/oauth2/youtube-oauth2.json")
-  credentials = storage.get()
+    # Path to the original read-only credentials file
+    original_credentials_path = "/oauth2/youtube-oauth2.json"
 
-  if credentials is None or credentials.invalid:
-    credentials = run_flow(flow, storage, args)
+    # Create a temporary file and copy the content of the original credentials file to it
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_path = temp_file.name
+        with open(original_credentials_path, 'r') as original_file:
+            shutil.copyfileobj(original_file, temp_file)
 
-  return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
-    http=credentials.authorize(httplib2.Http()))
+    storage = Storage(temp_path)
+    credentials = storage.get()
+
+    if credentials is None or credentials.invalid:
+        credentials = run_flow(flow, storage, args)
+
+    return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
+        http=credentials.authorize(httplib2.Http()))
 
 
 def initialize_upload(youtube, options):
