@@ -75,12 +75,12 @@ def pick_subject(cloud_run):
         get_subjects(True)
         subjects = utils.read_subjects()
     df = pd.DataFrame(subjects)
-    print(df.to_string())
+    print(df.to_string()) # Only to show it in a formatted manner
     if not cloud_run:
         select = int(input('Select subject index: '))
         return subjects[select]
     else:
-        select = random.randint(0,len(df))
+        select = random.randint(0,len(subjects)-1)
         return subjects[select]
 
 
