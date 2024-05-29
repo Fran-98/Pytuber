@@ -46,7 +46,10 @@ def read_subjects():
     for file in file_list:
         if "subjects" in file['title']:
             #print(file['title'])
-            return read_file(file['title'], file['id']).splitlines()
+            subjects = read_file(file['title'], file['id']).splitlines()
+            if len(subjects<=1):
+                return None
+            return subjects
 
     # If no subject exist, create one
 
@@ -88,7 +91,7 @@ def delete_subject(subject):
     for item in subjects:
         if item != subject:
             items += item+'\n'
-    
+
     upload_subject(items)
             
 
