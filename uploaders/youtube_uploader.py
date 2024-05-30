@@ -21,6 +21,9 @@ from googleapiclient.discovery import build
 import google_auth_httplib2
 import httplib2
 
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+from oauth2client.service_account import ServiceAccountCredentials
 # Explicitly tell the underlying HTTP transport library not to retry, since
 # we are handling retry logic ourselves.
 httplib2.RETRIES = 1
@@ -74,6 +77,58 @@ https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
 VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")
 
 
+gauth = GoogleAuth()
+scope = ["https://www.googleapis.com/auth/drive"]
+gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name('/secrets/client_secrets.json', scope)
+drive = GoogleDrive(gauth)
+
+def get_youtube_credentials():
+    """
+    Function to read credential files from google drive
+    """
+    file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+
+    for file in file_list:
+        if "youtube-oauth2" in file['title']:
+
+            metadata = dict(id = file['id'])
+
+            google_file = drive.CreateFile(metadata = metadata)
+
+            google_file.GetContentFile(filename = f"/tmp/{file['title']}.json")
+
+            content_bytes = google_file.content ; # BytesIO
+
+            string_data = content_bytes.read().decode( 'utf-8' )
+            print('Got credentials on google drive')
+            return string_data
+        
+    return None
+
+
+def find_youtube_credentials():
+    file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+
+    for file in file_list:
+        #print(file)
+        if "youtube-oauth2" in file['title']:
+            return file['id']
+    
+    # If not found a file return None and manage that case
+    return None
+
+
+def save_youtube_credentials(items: str):
+    creds_id = find_youtube_credentials()
+    if creds_id:
+        file1 = drive.CreateFile({'title': 'youtube-oauth2.json', 'id': creds_id})
+    else:
+        file1 = drive.CreateFile({'title': 'youtube-oauth2.json'}) # Create new file
+
+    file1.SetContentString(items)
+    file1.Upload() # Files.insert()
+
+
 # def get_authenticated_service(args):
 #     flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE,
 #                                    scope=YOUTUBE_UPLOAD_SCOPE,
@@ -112,11 +167,16 @@ def get_authenticated_service(args):
     # Path to the original read-only credentials file
     original_credentials_path = "/oauth2/youtube-oauth2.json"
 
+    credentials_drive = get_youtube_credentials()
+
     # Create a temporary file and copy the content of the original credentials file to it
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         temp_path = temp_file.name
-        with open(original_credentials_path, 'rb') as original_file:
-            shutil.copyfileobj(original_file, temp_file)
+        if credentials_drive:
+            temp_file.write(credentials_drive.encode('utf-8'))
+        else:
+            with open(original_credentials_path, 'rb') as original_file:
+                shutil.copyfileobj(original_file, temp_file)
 
     storage = Storage(temp_path)
     credentials = storage.get()
@@ -124,6 +184,9 @@ def get_authenticated_service(args):
     if credentials is None or credentials.invalid:
         credentials = run_flow(flow, storage, args)
 
+    with open(temp_path, 'r') as temp_file:
+        save_youtube_credentials(temp_file.read())
+   
     return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
         http=credentials.authorize(httplib2.Http()))
 

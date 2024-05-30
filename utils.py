@@ -23,6 +23,7 @@ def delete_folder_contents(folder_path):
     print("Assets cleaned")
 
 
+
 def read_file(title_file, id_file):
     """
     Function to read txt files from google drive
