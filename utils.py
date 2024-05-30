@@ -47,7 +47,7 @@ def read_subjects():
         if "subjects" in file['title']:
             #print(file['title'])
             subjects = read_file(file['title'], file['id']).splitlines()
-            if len(subjects<=1):
+            if len(subjects)<=1:
                 return None
             return subjects
 
