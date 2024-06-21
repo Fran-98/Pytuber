@@ -100,7 +100,7 @@ def generate_video(file_name, cloud_run):
                 if input_subject:
                     subject = input('Input the subject you want: ')
                 else:
-                    subject = pick_subject()
+                    subject = pick_subject(cloud_run)
             else:
                 subject = pick_subject(cloud_run)
         
@@ -247,17 +247,12 @@ def upload(file_name, schedule_time):
     utils.delete_subject(meta['subject'])
 
     # TikTok upload
-
-
-    uploadVideo(os.environ['TIKTOK_SESSION_ID'],
-                f"/tmp/result/{file_name}.webm",
-                meta['video_name'],
-                meta['tags'],
-                round(datetime.datetime(time[0], time[1], time[2], time[3], time[4]).timestamp())
-    )
-    # upload_video('short.webm', 
-    #         description=video_description, 
-    #         cookies_list=cookies_list)
+    # uploadVideo(os.environ['TIKTOK_SESSION_ID'],
+    #             f"/tmp/result/{file_name}.webm",
+    #             meta['video_name'],
+    #             meta['tags'],
+    #             round(datetime.datetime(time[0], time[1], time[2], time[3], time[4]).timestamp())
+    # )
         
     
 def main():

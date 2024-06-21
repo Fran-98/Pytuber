@@ -79,6 +79,7 @@ def uploadVideo(session_id, video, title, tags, schedule_time=0, verbose=True):
 	url = "https://www.tiktok.com/api/v1/video/upload/auth/"
 	r = session.get(url)
 	assertSuccess(url, r)
+	print(r.json())
 	access_key = r.json()["video_token_v5"]["access_key_id"]
 	secret_key = r.json()["video_token_v5"]["secret_acess_key"]
 	session_token = r.json()["video_token_v5"]["session_token"]
