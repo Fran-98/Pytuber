@@ -1,13 +1,18 @@
-import os, re, subs, utils, random
+import os
+import re
+import subs
+import utils
+import random
 import videos
-import uploaders.youtube_selenium as youtube_selenium
-#from tiktok_uploader.upload import upload_video
+import datetime
+
 import pandas as pd
-from moviepy.editor import * # Taking my code months later I see that this is a really bad practice
+import moviepy.editor as mpe
 from moviepy.video.tools.subtitles import SubtitlesClip
 
 from llm.openai_utils import get_keywords, get_keywords_videos, get_description, get_script, get_subjects
 
+from uploaders.tiktok_uploader import uploadVideo
 from tiktokvoice import generate_tts
 
 tiktok_session_id = os.environ['TIKTOK_SESSION_ID']
@@ -46,9 +51,9 @@ def tts(file_name, script:str):
             i+=1
     audio = []
     for i in range(len(p)):
-        audio.append(AudioFileClip(f'/tmp/assets/{file_name}_script{i}.mp3'))
+        audio.append(mpe.AudioFileClip(f'/tmp/assets/{file_name}_script{i}.mp3'))
     #audio.pop(-1)
-    final_audio = concatenate_audioclips(audio)
+    final_audio = mpe.concatenate_audioclips(audio)
 
     #Si el audio es mas largo que un corto de youtube repito todo
     if final_audio.duration >= 60:
@@ -63,7 +68,7 @@ def get_videos(keywords:list):
     for keyword in keywords:
         #print("--------------------------------VIDEO-------------------------------")
         vid = videos.get_video_url(keyword)
-        if vid != None:
+        if vid is not None:
             print(keyword)
             videos.save_video(keyword, vid)
 
@@ -124,7 +129,7 @@ def generate_video(file_name, cloud_run):
         get_videos(keywords)
 
         # get length of tts
-        audio = AudioFileClip(f'/tmp/assets/{file_name}.mp3')
+        audio = mpe.AudioFileClip(f'/tmp/assets/{file_name}.mp3')
         duration = audio.duration
         video_duration = duration/len(keywords)
 
@@ -133,7 +138,7 @@ def generate_video(file_name, cloud_run):
         extra_time = 0
         for keyword in keywords:
             try:
-                videos.append(VideoFileClip('/tmp/assets/'+keyword+'.mp4'))
+                videos.append(mpe.VideoFileClip('/tmp/assets/'+keyword+'.mp4'))
                 videos[-1]=videos[-1].without_audio()
                 videos[-1]=videos[-1].resize(width=1920)
                 videos[-1]=videos[-1].crop(x_center = videos[-1].size[0]/2, y_center = videos[-1].size[1]/2, width = 607.5, height = 1080)
@@ -149,7 +154,7 @@ def generate_video(file_name, cloud_run):
         if extra_time > 0:
             for keyword in keywords:
                 try:
-                    videos.append(VideoFileClip('/tmp/assets/'+keyword+'.mp4'))
+                    videos.append(mpe.VideoFileClip('/tmp/assets/'+keyword+'.mp4'))
                     videos[-1]=videos[-1].without_audio()
                     videos[-1]=videos[-1].resize(width=1920)
                     videos[-1]=videos[-1].crop(x_center = videos[-1].size[0]/2, y_center = videos[-1].size[1]/2, width = 607.5, height = 1080)
@@ -171,16 +176,16 @@ def generate_video(file_name, cloud_run):
         # Merge videos and tts #
         # ---------------------#
 
-        final = concatenate_videoclips(videos, method= 'compose')
+        final = mpe.concatenate_videoclips(videos, method= 'compose')
         final = final.set_audio(audio)
         #final = final.crop(x_center = 1920/2, y_center = 1080/2, width = 607.5, height = 1080)
 
         # Add subtitles
         subs.get_str_file(file_name)
         #print(TextClip.list('font'))
-        generator = lambda txt: TextClip(txt, font='Impact-Regular', fontsize=32, color='white', stroke_color= 'black', stroke_width= 1, method='caption',size=final.size)
+        generator = lambda txt: mpe.TextClip(txt, font='Impact-Regular', fontsize=32, color='white', stroke_color= 'black', stroke_width= 1, method='caption',size=final.size)
         sub_clip = SubtitlesClip('/tmp/assets/subs.srt', generator)
-        final = CompositeVideoClip([final, sub_clip])
+        final = mpe.CompositeVideoClip([final, sub_clip])
 
         # Output file
         print('---------------------------------------------------\nBuilding short final file\n---------------------------------------------------')
@@ -236,21 +241,20 @@ def upload(file_name, schedule_time):
 
     # Parse time
     time = utils.parse_time_to_now(schedule_time)
-    
     meta = utils.load_metadata(file_name)
-    #youtube_selenium.upload_video(meta['video_name'], meta['video_description'], meta['tags'], file_name, schedule_time)
+    # Youtube upload
     utils.youtube_upload(file_name, meta['video_name'], meta['video_description'], 22, meta['tags'], time, "private")
     utils.delete_subject(meta['subject'])
 
     # TikTok upload
-    # cookies_list = {
-    # "domain": ".tiktok.com",
-    # "expirationDate": 1704289252,
-    # "name": "sessionid",
-    # "path": "/",
-    # "value": "3f6dfa6694e17b4fcc78a958c77ed021"
-    #                 }
-    
+
+
+    uploadVideo(os.environ['TIKTOK_SESSION_ID'],
+                f"/tmp/result/{file_name}.webm",
+                meta['video_name'],
+                meta['tags'],
+                round(datetime.datetime(time[0], time[1], time[2], time[3], time[4]).timestamp())
+    )
     # upload_video('short.webm', 
     #         description=video_description, 
     #         cookies_list=cookies_list)
