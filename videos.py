@@ -15,13 +15,12 @@ def get_video_url(query):
 def get_video_url_pexel(query,):
     url = f'https://api.pexels.com/videos/search?query={query}&per_page={videos_per_page}'
     headers = {
-        'Authorization':pexel_key,
+        'Authorization': pexel_key,
     }
     r = requests.get(headers=headers, url=url)
-    # print(r)
-    if r.status_code != 400:
+    #print(r.text)
+    if r.status_code == 200:
         response = r.json()
-        #print(response)
         if response['total_results'] > 0:
             repeat = True
             i = 0
@@ -60,7 +59,7 @@ def get_video_url_pixabay(query: str,):
 
     r = requests.get(url=url)
     # print(r)
-    if r.status_code != 400:
+    if r.status_code == 200:
         response = r.json()
         #print(response)
         if response['total'] > 0:
